@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
-import db from "../db.js";
-import { EvaluationStatus } from "../types/index.js";
-import { requireRole } from "../middleware/auth.js";
+import db from "../db";
+import { EvaluationStatus } from "../types/index";
+import { requireRole } from "../middleware/auth";
 
 const router = Router();
 

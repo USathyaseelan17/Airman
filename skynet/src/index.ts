@@ -1,9 +1,9 @@
 import express from "express";
-import { authMiddleware } from "./middleware/auth.js";
+import { authMiddleware } from "./middleware/auth";
 
 // Route imports (we'll create these next)
-import peopleRouter from "./routes/people.js";
-import evaluationsRouter from "./routes/evaluations.js";
+import peopleRouter from "./routes/people";
+import evaluationsRouter from "./routes/evaluations";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

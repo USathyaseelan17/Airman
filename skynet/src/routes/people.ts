@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import db from "../db.js";
-import { UserRole } from "../types/index.js";
+import db from "../db";
+import { UserRole } from "../types/index";
 
 const router = Router();
 
