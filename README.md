@@ -383,7 +383,7 @@ All code was reviewed, understood, and manually adjusted before finalisation.
 **Duplicate evaluation guard:**  
 The DB should enforce a unique constraint on `(person_id, course_id, period_start, period_end)` to prevent the same student being evaluated twice for the same period. This is noted in the assessment requirements and is a straightforward migration change.
 
-**Audit logging (Level 2 — Option B):**  
+**Audit logging**  
 An `audit_logs` table capturing `user_id`, `tenant_id`, `action`, `resource_type`, `resource_id`, `before_state`, `after_state`, and `timestamp` on every evaluation create/update/status change and insight generation. This would be particularly valuable for AIRMAN's compliance workflows.
 
 **Pagination:**  
