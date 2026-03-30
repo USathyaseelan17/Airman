@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+
+  # ─── PostgreSQL Database ───────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: airman_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      # host_port:container_port
+      # Maps port 5432 inside container to 5432 on your machine
+      # So you can still connect with psql locally
+      - "5432:5432"
+    volumes:
+      # Persists data between container restarts
+      # Without this, all data is lost when postgres container stops
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # Docker waits until postgres is actually ready before
+      # starting skynet — prevents "connection refused" errors on startup
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── Maverick FastAPI Service ──────────────────────────────────────────────
+  maverick:
+    build:
+      context: ./maverick
+      dockerfile: Dockerfile
+    container_name: airman_maverick
+    environment:
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    # Maverick doesn't need postgres so it starts independently
+    # No depends_on needed here
+
+  # ─── Skynet Node.js Service ────────────────────────────────────────────────
+  skynet:
+    build:
+      context: ./skynet
+      dockerfile: Dockerfile
+    container_name: airman_skynet
+    environment:
+      PORT: ${PORT}
+      DB_HOST: postgres       # "postgres" is the service name above
+      DB_PORT: 5432           # internal container port
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Inside Docker, services talk to each other by service name
+      # So Skynet reaches Maverick at http://maverick:8000
+      MAVERICK_URL: http://maverick:8000
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      postgres:
+        # Skynet waits until postgres healthcheck passes before starting
+        condition: service_healthy
+      maverick:
+        condition: service_started
+    # Run migrations and seeds before starting the server
+    # The && chains commands — if migrate fails, seed and server don't run
+    command: >
+      sh -c "npx knex migrate:latest --knexfile knexfile.ts &&
+             npx knex seed:run --knexfile knexfile.ts &&
+             npx ts-node src/index.ts"
+
+# ─── Named Volumes ─────────────────────────────────────────────────────────
+# Declares the volume used by postgres
+# Data survives container restarts but can be cleared with:
+# docker compose down -v
+volumes:
+  postgres_data:
