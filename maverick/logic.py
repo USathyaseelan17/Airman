@@ -3,7 +3,7 @@ from models import EvaluationInput, InsightOutput
 
 # ─── Performance Tiers ────────────────────────────────────────────────────────
 # Every rating (1-5) is classified into one of three tiers.
-# This is the foundation everything else builds on.
+
 
 def classify_rating(rating: int) -> str:
     if rating <= 2:
@@ -65,7 +65,7 @@ RECOMMENDATION_RULES = {
 
 
 # ─── Summary Templates ────────────────────────────────────────────────────────
-# Builds a human-readable summary sentence based on what is
+# Builds a clear summary sentence based on what is
 # strong and what is weak.
 
 def build_summary(

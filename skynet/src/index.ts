@@ -1,7 +1,7 @@
 import express from "express";
 import { authMiddleware } from "./middleware/auth";
 
-// Route imports (we'll create these next)
+// Route imports
 import peopleRouter from "./routes/people";
 import evaluationsRouter from "./routes/evaluations";
 
@@ -17,7 +17,7 @@ app.get("/health", (_req, res) => {
 });
 
 // ─── Protected API Routes ─────────────────────────────────────────────────────
-// authMiddleware runs on every /api/* request
+
 app.use("/api", authMiddleware);
 app.use("/api/people", peopleRouter);
 app.use("/api/evaluations", evaluationsRouter);
@@ -33,7 +33,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: "Internal Server Error", message: err.message });
 });
 
-// ─── Start ────────────────────────────────────────────────────────────────────
+
 app.listen(PORT, () => {
   console.log(`Skynet API running on port ${PORT}`);
 });

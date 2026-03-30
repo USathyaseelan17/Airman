@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
-  // 1. Users/People Table [cite: 93-106]
+  // 1. Users/People Table 
   await knex.schema.createTable("people", (table) => {
     table.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     table.string("tenant_id").notNullable().index(); 
@@ -12,16 +12,16 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamps(true, true);
   });
 
-  // 2. Courses Table [cite: 107-113]
+  // 2. Courses Table
   await knex.schema.createTable("courses", (table) => {
     table.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     table.string("tenant_id").notNullable().index();
     table.string("name").notNullable();
-    table.string("license_type").notNullable(); // e.g., PPL, CPL [cite: 118]
+    table.string("license_type").notNullable(); 
     table.timestamps(true, true);
   });
 
-  // 3. Enrollments Table [cite: 114-122]
+  // 3. Enrollments Table 
   await knex.schema.createTable("enrollments", (table) => {
     table.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     table.string("tenant_id").notNullable().index();
@@ -32,12 +32,12 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamps(true, true);
   });
 
-  // 4. Evaluations Table [cite: 123-141]
+  // 4. Evaluations Table 
   await knex.schema.createTable("evaluations", (table) => {
     table.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     table.string("tenant_id").notNullable().index();
-    table.uuid("person_id").references("id").inTable("people"); // Student
-    table.uuid("evaluator_id").references("id").inTable("people"); // Admin/Instructor
+    table.uuid("person_id").references("id").inTable("people"); 
+    table.uuid("evaluator_id").references("id").inTable("people"); 
     table.uuid("course_id").references("id").inTable("courses");
     table.integer("overall_rating").checkBetween([1, 5]); // [cite: 163]
     table.integer("technical_rating").checkBetween([1, 5]);
@@ -48,11 +48,11 @@ export async function up(knex: Knex): Promise<void> {
     table.dateTime("period_end").notNullable();
     table.timestamps(true, true);
     
-    // Constraint: end >= start [cite: 164]
+
     table.check("?? >= ??", ["period_end", "period_start"]);
   });
 
-  // 5. Evaluation Insights (Maverick Response) [cite: 142-149]
+  // 5. Evaluation Insights (Maverick Response)
   await knex.schema.createTable("evaluation_insights", (table) => {
     table.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     table.uuid("evaluation_id").references("id").inTable("evaluations").onDelete("CASCADE");

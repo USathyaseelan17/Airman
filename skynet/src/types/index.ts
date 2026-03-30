@@ -6,7 +6,7 @@ export type EnrollmentStatus = "active" | "completed" | "dropped";
 export type EvaluationStatus = "draft" | "submitted" | "archived";
 export type LicenseType = "PPL" | "CPL" | "ATPL" | "TypeRating";
 
-// ─── DB Row Types (match migration columns exactly) ───────────────────────────
+// ─── DB Row Types  ───────────────────────────
 
 export interface Person {
   id: string;
@@ -65,7 +65,7 @@ export interface EvaluationInsight {
   generated_at: Date;
 }
 
-// ─── Request Context (attached by auth middleware) ────────────────────────────
+// ─── Request Context  ────────────────────────────
 
 export interface AuthUser {
   id: string;

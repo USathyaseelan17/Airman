@@ -12,11 +12,11 @@ const router = Router();
 // ─────────────────────────────────────────────────────────────
 router.get("/", async (req: Request, res: Response): Promise<void> => {
   const { role, search } = req.query;
-  const tenantId = req.user.tenant_id; // always scoped to the logged-in user's tenant
+  const tenantId = req.user.tenant_id; 
 
   try {
     // ── Step 1: Build the base people query ──────────────────
-    // Always filter by tenant_id first — this is non-negotiable
+
     const query = db("people")
       .where("people.tenant_id", tenantId)
       .select(
@@ -42,8 +42,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
     }
 
     // Optional: search by name or email (case-insensitive)
-    // ILIKE is PostgreSQL's case-insensitive LIKE
-    // So search=arjun matches "Arjun Mehta" and "arjun@student.com"
+
     if (search) {
       query.where((builder) => {
         builder
@@ -55,8 +54,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
     const people = await query;
 
     // ── Step 2: For students, attach enrollment + eval data ──
-    // We only do the extra queries if there are students in the result
-    // This avoids unnecessary DB calls when listing only instructors/admins
+
     const studentIds = people
       .filter((p) => p.role === "student")
       .map((p) => p.id);
@@ -69,7 +67,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
     if (studentIds.length > 0) {
       // ── Enrollment + Course info ─────────────────────────
       // Join enrollments with courses to get course name + license type
-      // whereIn fetches data for ALL students in one query (efficient)
+
       const enrollments = await db("enrollments")
         .join("courses", "enrollments.course_id", "courses.id")
         .whereIn("enrollments.student_id", studentIds)
@@ -83,8 +81,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
           "courses.license_type"
         );
 
-      // Convert the array into a map for O(1) lookup later
-      // { "student-uuid": { course_name, license_type, ... } }
+
       enrollmentMap = enrollments.reduce((map, row) => {
         map[row.student_id] = {
           course_id: row.course_id,
@@ -97,9 +94,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
       }, {} as Record<string, object>);
 
       // ── Evaluation stats ─────────────────────────────────
-      // For each student: count of evaluations + average ratings
-      // groupBy groups the results by person_id so each student
-      // gets their own row with their own averages
+
       const evalStats = await db("evaluations")
         .whereIn("person_id", studentIds)
         .where("tenant_id", tenantId)
@@ -112,7 +107,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
           db.raw("ROUND(AVG(non_technical_rating), 2) as avg_non_technical")
         );
 
-      // Convert to map: { "student-uuid": { evaluation_count, avg_overall, ... } }
+
       evalStatsMap = evalStats.reduce((map, row) => {
         map[row.person_id] = {
           evaluation_count: Number(row.evaluation_count),
@@ -126,7 +121,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
 
     // ── Step 3: Merge everything into the final response ────
     // For each person, if they're a student, attach the extra data
-    // If they're not a student, those fields simply won't appear
+    // If they're not a student, those fields  won't appear
     const result = people.map((person) => {
       if (person.role !== "student") {
         // Admins and instructors — return as-is

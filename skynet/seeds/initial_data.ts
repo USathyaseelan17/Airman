@@ -10,7 +10,7 @@ export async function seed(knex: Knex): Promise<void> {
 
   const tenantId = "school_alpha_001"; // Consistent tenant for testing 
 
-  // 1. Insert People (Admin, Instructors, Students) [cite: 169-171]
+  // 1. Insert People (Admin, Instructors, Students) 
   const [admin, inst1, inst2, ...students] = await knex("people").insert([
     { tenant_id: tenantId, name: "Aditi Sharma", email: "admin@school.com", role: "admin" },
     { tenant_id: tenantId, name: "Capt. Rajesh", email: "rajesh@school.com", role: "instructor" },
@@ -22,13 +22,13 @@ export async function seed(knex: Knex): Promise<void> {
     { tenant_id: tenantId, name: "Rohan Varma", email: "rohan@student.com", role: "student" }
   ]).returning("*");
 
-  // 2. Insert Courses [cite: 172]
+  // 2. Insert Courses 
   const [cpl, ppl] = await knex("courses").insert([
     { tenant_id: tenantId, name: "CPL Integrated", license_type: "CPL" },
     { tenant_id: tenantId, name: "Private Pilot License", license_type: "PPL" }
   ]).returning("*");
 
-  // 3. Insert Enrollments [cite: 173]
+  // 3. Insert Enrollments 
   await knex("enrollments").insert(
     students.map((s, index) => ({
       tenant_id: tenantId,
@@ -39,7 +39,7 @@ export async function seed(knex: Knex): Promise<void> {
     }))
   );
 
-  // 4. Insert Sample Evaluations [cite: 174]
+  // 4. Insert Sample Evaluations 
   await knex("evaluations").insert([
     {
       tenant_id: tenantId,
